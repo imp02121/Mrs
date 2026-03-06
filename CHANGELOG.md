@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- HTTP API with Axum (Phase 5)
+  - REST API served via `sr-engine serve`, default bind `0.0.0.0:3001`
+  - `AppState` with `PgPool` and optional `ValkeyCache` for shared handler state
+  - `ApiError` enum with `IntoResponse` producing structured JSON errors (`{"error": {"code", "message", "details"}}`)
+  - `ApiResponse<T>` and `PaginatedResponse<T>` wrappers for consistent JSON output
+  - Middleware stack: CORS (permissive), tracing, 300s timeout, compression
+  - `GET /api/health` health check endpoint
+  - Backtest endpoints:
+    - `POST /api/backtest/run` — run a backtest (parse config, fetch candles, execute engine, save to DB, cache result)
+    - `GET /api/backtest/{id}` — fetch result (cache-first with DB fallback)
+    - `GET /api/backtest/{id}/trades` — paginated trade list
+    - `POST /api/backtest/compare` — run 2-4 configs side by side
+    - `GET /api/backtest/history` — paginated past runs
+  - Strategy config CRUD:
+    - `POST /api/configs` — create config (201)
+    - `GET /api/configs` — list configs
+    - `GET /api/configs/{id}` — get config
+    - `DELETE /api/configs/{id}` — delete config (204)
+  - Data endpoints:
+    - `GET /api/data/instruments` — list instruments from DB
+    - `GET /api/data/candles` — query candles by instrument and date range
+    - `POST /api/data/fetch` — placeholder returning 202 Accepted
+  - Signal endpoints:
+    - `GET /api/signals/today` — today's signals across all instruments
+    - `GET /api/signals/{instrument}/latest` — latest signal for instrument (404 if none)
+  - CLI wired: `sr-engine serve` starts API server, `sr-engine migrate` runs DB migrations
+  - API reference documentation (`docs/api.md`)
+
 - Database and cache layer (Phase 4)
   - PostgreSQL migrations for 7 tables: instruments, candles, strategy_configs, backtest_runs, trades, live_signals, subscribers
   - Monthly-partitioned candles table (36 partitions covering 2024-01 through 2026-12)
