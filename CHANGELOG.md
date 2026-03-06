@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Core strategy engine (Phase 2)
+  - `StrategyConfig` struct with all configurable parameters (signal detection, stop loss, exit, adding to winners, session timing, backtest scope) using `Decimal` for financial values
+  - `Direction`, `StopLossMode`, `ExitMode`, `PositionStatus` enums with serde and Display
+  - Signal bar detection (`find_signal_bar`) with DST-aware UTC timestamp matching
+  - `SignalBar` struct with pre-computed buy/sell stop levels
+  - Order generation (`generate_orders`) with three stop loss modes: SignalBarExtreme, FixedPoints, Midpoint
+  - Index-level-proportional stop loss scaling (`sl_scale_with_index`)
+  - Fill simulation (`check_fill`, `determine_fill_order`) with gap handling, slippage, and both-sides-triggered priority
+  - `Position` struct with 6-step per-candle update logic (SL, best price, trailing, TP, adds, time exit)
+  - Conservative assumption: stop loss checked before any favorable exit on same candle
+  - Adding to winners (`check_add_trigger`) with configurable intervals, max additions, size multiplier, and stop tightening
+  - `Trade` struct with full PnL computation including add-on positions, commission, and slippage
+  - Comprehensive unit tests for all strategy modules (all four instruments, DST transitions, edge cases)
+- Strategy documentation (`docs/strategy.md`) with worked examples, parameter reference, and processing order explanation
+
 - Core data models (Phase 1)
   - `Candle` struct with OHLCV fields, `Decimal` precision, and display formatting
   - `Instrument` enum (DAX, FTSE, Nasdaq, Dow) with DST-aware signal bar UTC conversion

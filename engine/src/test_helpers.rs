@@ -8,6 +8,8 @@ use rust_decimal::Decimal;
 use std::str::FromStr;
 
 use crate::models::{Candle, Instrument};
+use crate::strategy::config::StrategyConfig;
+use crate::strategy::signal::SignalBar;
 
 /// Shorthand for constructing a [`NaiveDate`].
 ///
@@ -103,4 +105,44 @@ pub fn make_day_candles(
 /// Panics if the string is not a valid decimal.
 pub fn dec(s: &str) -> Decimal {
     Decimal::from_str(s).expect("invalid decimal in test helper")
+}
+
+/// Returns a default [`StrategyConfig`] suitable for most tests.
+///
+/// Matches the original School Run parameters: DAX, 2nd candle,
+/// 2-point offset, fixed 40-point stop, end-of-day exit.
+pub fn default_config() -> StrategyConfig {
+    StrategyConfig::default()
+}
+
+/// Construct a [`SignalBar`] from an instrument, date, and OHLC values.
+///
+/// Creates a candle at the correct signal bar UTC time for the given
+/// instrument and date, then wraps it in a `SignalBar` with buy/sell
+/// levels computed from the config's entry offset.
+///
+/// # Panics
+///
+/// Panics if the signal bar UTC time cannot be computed.
+pub fn make_signal_bar(
+    instrument: Instrument,
+    day: NaiveDate,
+    open: f64,
+    high: f64,
+    low: f64,
+    close: f64,
+    config: &StrategyConfig,
+) -> SignalBar {
+    let candles = make_day_candles(instrument, day, &[(open, high, low, close)]);
+    let candle = candles
+        .into_iter()
+        .next()
+        .expect("make_day_candles produced no candles");
+    SignalBar {
+        date: day,
+        instrument,
+        buy_level: candle.high + config.entry_offset_points,
+        sell_level: candle.low - config.entry_offset_points,
+        candle,
+    }
 }

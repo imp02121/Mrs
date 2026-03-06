@@ -225,7 +225,7 @@ mod tests {
     #[test]
     fn test_batch_size_within_postgres_limits() {
         // 1000 rows * 7 params = 7000, well under 65535 limit.
-        assert!(BATCH_SIZE * 7 < 65535);
+        const { assert!(BATCH_SIZE * 7 < 65535) };
     }
 
     #[test]
