@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Database and cache layer (Phase 4)
+  - PostgreSQL migrations for 7 tables: instruments, candles, strategy_configs, backtest_runs, trades, live_signals, subscribers
+  - Monthly-partitioned candles table (36 partitions covering 2024-01 through 2026-12)
+  - Instruments table seeded with DAX, FTSE, IXIC, DJI
+  - SQLx typed query functions for all tables with bulk upsert support (1000-row batches)
+  - Valkey cache (`ValkeyCache`) with JSON serialization and domain-specific helpers
+  - Key patterns: `sr:signal:{ticker}:latest` (24h), `sr:backtest:{run_id}:result` (7d), `sr:backtest:{run_id}:progress` (1h)
+  - Write-behind pipeline (`WriteBehindWorker`) with mpsc channel, 500ms/100-item batch flush to Postgres
+  - Cache-first reader (`CacheReader`) with Valkey-first lookup, Postgres fallback, and automatic cache backfill
+  - Graceful degradation: reads fall back to Postgres when Valkey is unavailable
+  - Architecture documentation (`docs/database.md`, `docs/cache.md`)
+
 - Backtest engine (Phase 3)
   - Core backtest loop (`run_backtest`) with day-by-day iteration over candles applying the School Run Strategy
   - Candle grouping by trading date using instrument's exchange timezone
