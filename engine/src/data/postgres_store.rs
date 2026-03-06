@@ -3,7 +3,7 @@
 //! Provides bulk upsert and query operations against the `candles` table.
 //! Upserts use `INSERT ... ON CONFLICT (instrument_id, timestamp) DO UPDATE`
 //! to ensure idempotent writes. Large batches are split into groups of
-//! [`BATCH_SIZE`] to stay within Postgres parameter limits.
+//! 1000-row batches to stay within Postgres parameter limits.
 
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
@@ -36,7 +36,7 @@ impl PostgresStore {
 
     /// Bulk upsert candles into the `candles` table.
     ///
-    /// Candles are inserted in batches of [`BATCH_SIZE`]. On conflict
+    /// Candles are inserted in batches of 1000. On conflict
     /// (same `instrument_id` + `timestamp`), the existing row is updated
     /// with the new OHLCV values.
     ///

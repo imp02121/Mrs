@@ -258,7 +258,7 @@ impl TwelveDataProvider {
 impl DataProvider for TwelveDataProvider {
     /// Fetch candles for an instrument over a date range.
     ///
-    /// Automatically splits long ranges into chunks of [`MAX_DAYS_PER_CHUNK`]
+    /// Automatically splits long ranges into chunks of 145 days
     /// to stay within the API's 5000-row limit per request, then concatenates
     /// and sorts the results.
     async fn fetch_candles(

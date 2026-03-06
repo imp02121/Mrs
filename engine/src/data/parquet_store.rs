@@ -592,6 +592,146 @@ mod tests {
     }
 
     #[test]
+    fn test_read_across_year_boundary() {
+        let tmp = TempDir::new().unwrap();
+        let store = ParquetStore::new(tmp.path());
+
+        let candles = vec![
+            make_candle(Instrument::Dax, 2023, 12, 29, 8),
+            make_candle(Instrument::Dax, 2023, 12, 30, 8),
+            make_candle(Instrument::Dax, 2024, 1, 2, 8),
+            make_candle(Instrument::Dax, 2024, 1, 3, 8),
+        ];
+
+        store.write_candles(&candles).unwrap();
+
+        // Read across the year boundary.
+        let range = DateRange::new(
+            NaiveDate::from_ymd_opt(2023, 12, 28).unwrap(),
+            NaiveDate::from_ymd_opt(2024, 1, 5).unwrap(),
+        )
+        .unwrap();
+
+        let read = store.read_candles(Instrument::Dax, range).unwrap();
+        assert_eq!(read.len(), 4);
+        // First candle should be Dec 29, last should be Jan 3.
+        assert_eq!(
+            read[0].timestamp.date_naive(),
+            NaiveDate::from_ymd_opt(2023, 12, 29).unwrap()
+        );
+        assert_eq!(
+            read[3].timestamp.date_naive(),
+            NaiveDate::from_ymd_opt(2024, 1, 3).unwrap()
+        );
+    }
+
+    #[test]
+    fn test_write_large_batch_2000_candles() {
+        let tmp = TempDir::new().unwrap();
+        let store = ParquetStore::new(tmp.path());
+
+        let base = NaiveDate::from_ymd_opt(2024, 1, 1)
+            .unwrap()
+            .and_hms_opt(0, 0, 0)
+            .unwrap()
+            .and_utc();
+
+        let candles: Vec<Candle> = (0..2000)
+            .map(|i| {
+                let ts = base + chrono::Duration::minutes(15 * i);
+                Candle {
+                    instrument: Instrument::Nasdaq,
+                    timestamp: ts,
+                    open: dec!(15000.00) + Decimal::from(i),
+                    high: dec!(15100.00) + Decimal::from(i),
+                    low: dec!(14900.00) + Decimal::from(i),
+                    close: dec!(15050.00) + Decimal::from(i),
+                    volume: i,
+                }
+            })
+            .collect();
+
+        let written = store.write_candles(&candles).unwrap();
+        assert_eq!(written, 2000);
+
+        // 2000 candles at 15-min = 500 hours = ~20.8 days, all in Jan 2024.
+        let range = DateRange::new(
+            NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
+            NaiveDate::from_ymd_opt(2024, 1, 31).unwrap(),
+        )
+        .unwrap();
+
+        let read = store.read_candles(Instrument::Nasdaq, range).unwrap();
+        assert_eq!(read.len(), 2000);
+    }
+
+    #[test]
+    fn test_read_single_day_range() {
+        let tmp = TempDir::new().unwrap();
+        let store = ParquetStore::new(tmp.path());
+
+        let candles = vec![
+            make_candle(Instrument::Dax, 2024, 1, 14, 8),
+            make_candle(Instrument::Dax, 2024, 1, 15, 8),
+            make_candle(Instrument::Dax, 2024, 1, 15, 9),
+            make_candle(Instrument::Dax, 2024, 1, 16, 8),
+        ];
+
+        store.write_candles(&candles).unwrap();
+
+        // Read only Jan 15.
+        let range = DateRange::new(
+            NaiveDate::from_ymd_opt(2024, 1, 15).unwrap(),
+            NaiveDate::from_ymd_opt(2024, 1, 15).unwrap(),
+        )
+        .unwrap();
+
+        let read = store.read_candles(Instrument::Dax, range).unwrap();
+        assert_eq!(read.len(), 2);
+        for c in &read {
+            assert_eq!(
+                c.timestamp.date_naive(),
+                NaiveDate::from_ymd_opt(2024, 1, 15).unwrap()
+            );
+        }
+    }
+
+    #[test]
+    fn test_all_four_instruments_independent_storage() {
+        let tmp = TempDir::new().unwrap();
+        let store = ParquetStore::new(tmp.path());
+
+        for instrument in Instrument::ALL {
+            let candle = Candle {
+                instrument,
+                timestamp: NaiveDate::from_ymd_opt(2024, 6, 1)
+                    .unwrap()
+                    .and_hms_opt(10, 0, 0)
+                    .unwrap()
+                    .and_utc(),
+                open: dec!(1000.0),
+                high: dec!(1100.0),
+                low: dec!(900.0),
+                close: dec!(1050.0),
+                volume: 999,
+            };
+            store.write_candles(&[candle]).unwrap();
+        }
+
+        let range = DateRange::new(
+            NaiveDate::from_ymd_opt(2024, 6, 1).unwrap(),
+            NaiveDate::from_ymd_opt(2024, 6, 1).unwrap(),
+        )
+        .unwrap();
+
+        for instrument in Instrument::ALL {
+            let read = store.read_candles(instrument, range).unwrap();
+            assert_eq!(read.len(), 1, "Expected 1 candle for {instrument}");
+            assert_eq!(read[0].instrument, instrument);
+        }
+    }
+
+    #[test]
     fn test_decimal_precision_roundtrip() {
         let tmp = TempDir::new().unwrap();
         let store = ParquetStore::new(tmp.path());

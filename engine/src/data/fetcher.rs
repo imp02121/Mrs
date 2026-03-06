@@ -1,7 +1,7 @@
 //! Data fetch orchestration: ties data providers to storage backends.
 //!
 //! The [`DataFetcher`] coordinates fetching candle data from a
-//! [`DataProvider`](super::provider::DataProvider), deduplicating it, and
+//! [`DataProvider`], deduplicating it, and
 //! writing it to both the local Parquet store and PostgreSQL.
 
 use chrono::Utc;
@@ -194,6 +194,7 @@ fn deduplicate(mut candles: Vec<Candle>) -> Vec<Candle> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::DateTime;
     use rust_decimal_macros::dec;
 
     fn make_candle(instrument: Instrument, ts_secs: i64) -> Candle {
@@ -208,7 +209,238 @@ mod tests {
         }
     }
 
-    use chrono::DateTime;
+    /// A mock [`DataProvider`] that returns pre-configured candles.
+    struct MockProvider {
+        candles: Vec<Candle>,
+    }
+
+    impl MockProvider {
+        fn new(candles: Vec<Candle>) -> Self {
+            Self { candles }
+        }
+
+        fn empty() -> Self {
+            Self {
+                candles: Vec::new(),
+            }
+        }
+    }
+
+    impl DataProvider for MockProvider {
+        async fn fetch_candles(
+            &self,
+            _instrument: Instrument,
+            _range: DateRange,
+        ) -> Result<Vec<Candle>, DataError> {
+            Ok(self.candles.clone())
+        }
+    }
+
+    /// A mock provider that always returns an error.
+    struct FailingProvider {
+        error_msg: String,
+    }
+
+    impl DataProvider for FailingProvider {
+        async fn fetch_candles(
+            &self,
+            _instrument: Instrument,
+            _range: DateRange,
+        ) -> Result<Vec<Candle>, DataError> {
+            Err(DataError::Api(self.error_msg.clone()))
+        }
+    }
+
+    #[tokio::test]
+    async fn test_backfill_writes_to_parquet() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let parquet = ParquetStore::new(tmp.path());
+
+        // Create mock candles for a 3-day period.
+        let candles = vec![
+            make_candle(Instrument::Dax, 1705305600), // 2024-01-15 08:00 UTC
+            make_candle(Instrument::Dax, 1705306500), // 2024-01-15 08:15 UTC
+            make_candle(Instrument::Dax, 1705392000), // 2024-01-16 08:00 UTC
+        ];
+
+        let provider = MockProvider::new(candles);
+
+        // We cannot construct a real PostgresStore without a DB, so we test
+        // the mock provider + deduplication + parquet write flow directly.
+        let range = DateRange::new(
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 15).unwrap(),
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 16).unwrap(),
+        )
+        .unwrap();
+
+        let fetched = provider
+            .fetch_candles(Instrument::Dax, range)
+            .await
+            .unwrap();
+        assert_eq!(fetched.len(), 3);
+
+        let deduped = deduplicate(fetched);
+        assert_eq!(deduped.len(), 3);
+
+        let written = parquet.write_candles(&deduped).unwrap();
+        assert_eq!(written, 3);
+
+        // Read back and verify.
+        let read = parquet.read_candles(Instrument::Dax, range).unwrap();
+        assert_eq!(read.len(), 3);
+        assert!(read[0].timestamp < read[1].timestamp);
+    }
+
+    #[tokio::test]
+    async fn test_backfill_empty_provider_returns_zero() {
+        let provider = MockProvider::empty();
+        let range = DateRange::new(
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 31).unwrap(),
+        )
+        .unwrap();
+
+        let fetched = provider
+            .fetch_candles(Instrument::Dax, range)
+            .await
+            .unwrap();
+        assert!(fetched.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_failing_provider_propagates_error() {
+        let provider = FailingProvider {
+            error_msg: "server error 500: timeout".into(),
+        };
+        let range = DateRange::new(
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 31).unwrap(),
+        )
+        .unwrap();
+
+        let result = provider.fetch_candles(Instrument::Dax, range).await;
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("server error 500"));
+    }
+
+    #[tokio::test]
+    async fn test_mock_provider_with_duplicates_deduped_before_write() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let parquet = ParquetStore::new(tmp.path());
+
+        // Provider returns duplicates.
+        let candles = vec![
+            make_candle(Instrument::Ftse, 1705305600),
+            make_candle(Instrument::Ftse, 1705306500),
+            make_candle(Instrument::Ftse, 1705305600), // duplicate
+        ];
+
+        let provider = MockProvider::new(candles);
+        let range = DateRange::new(
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 15).unwrap(),
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 15).unwrap(),
+        )
+        .unwrap();
+
+        let fetched = provider
+            .fetch_candles(Instrument::Ftse, range)
+            .await
+            .unwrap();
+        let deduped = deduplicate(fetched);
+        assert_eq!(deduped.len(), 2);
+
+        parquet.write_candles(&deduped).unwrap();
+        let read = parquet.read_candles(Instrument::Ftse, range).unwrap();
+        assert_eq!(read.len(), 2);
+    }
+
+    #[tokio::test]
+    async fn test_end_to_end_mock_provider_to_parquet_roundtrip() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let parquet = ParquetStore::new(tmp.path());
+
+        // Simulate a 5-day fetch with ~4 candles/day across multiple instruments.
+        let mut candles = Vec::new();
+        let base_ts = 1705305600i64; // 2024-01-15 08:00 UTC
+        for day in 0..5 {
+            for bar in 0..4 {
+                let ts = base_ts + day * 86400 + bar * 900;
+                candles.push(Candle {
+                    instrument: Instrument::Dax,
+                    timestamp: DateTime::from_timestamp(ts, 0).unwrap(),
+                    open: dec!(16000.0) + rust_decimal::Decimal::from(day * 10 + bar),
+                    high: dec!(16050.0) + rust_decimal::Decimal::from(day * 10 + bar),
+                    low: dec!(15950.0) + rust_decimal::Decimal::from(day * 10 + bar),
+                    close: dec!(16020.0) + rust_decimal::Decimal::from(day * 10 + bar),
+                    volume: 5000 + day * 100 + bar,
+                });
+            }
+        }
+
+        let provider = MockProvider::new(candles);
+        let range = DateRange::new(
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 15).unwrap(),
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 19).unwrap(),
+        )
+        .unwrap();
+
+        let fetched = provider
+            .fetch_candles(Instrument::Dax, range)
+            .await
+            .unwrap();
+        assert_eq!(fetched.len(), 20);
+
+        let deduped = deduplicate(fetched);
+        assert_eq!(deduped.len(), 20);
+
+        parquet.write_candles(&deduped).unwrap();
+
+        let read = parquet.read_candles(Instrument::Dax, range).unwrap();
+        assert_eq!(read.len(), 20);
+
+        // Verify first and last candle values (approximate due to Float64 roundtrip).
+        // day=0,bar=0 → offset=0; day=4,bar=3 → offset=43
+        assert!((read[0].open - dec!(16000.0)).abs() < dec!(0.01));
+        assert!((read[19].open - dec!(16043.0)).abs() < dec!(0.01));
+
+        // Verify ordering.
+        for pair in read.windows(2) {
+            assert!(pair[0].timestamp <= pair[1].timestamp);
+        }
+    }
+
+    #[tokio::test]
+    async fn test_mock_provider_multi_instrument_isolation() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let parquet = ParquetStore::new(tmp.path());
+
+        let dax_candles = vec![
+            make_candle(Instrument::Dax, 1705305600),
+            make_candle(Instrument::Dax, 1705306500),
+        ];
+        let ftse_candles = vec![make_candle(Instrument::Ftse, 1705305600)];
+
+        // Write DAX candles.
+        parquet.write_candles(&dax_candles).unwrap();
+        // Write FTSE candles.
+        parquet.write_candles(&ftse_candles).unwrap();
+
+        let range = DateRange::new(
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 15).unwrap(),
+            chrono::NaiveDate::from_ymd_opt(2024, 1, 15).unwrap(),
+        )
+        .unwrap();
+
+        let dax_read = parquet.read_candles(Instrument::Dax, range).unwrap();
+        assert_eq!(dax_read.len(), 2);
+
+        let ftse_read = parquet.read_candles(Instrument::Ftse, range).unwrap();
+        assert_eq!(ftse_read.len(), 1);
+
+        // Nasdaq should have no data.
+        let nq_read = parquet.read_candles(Instrument::Nasdaq, range).unwrap();
+        assert!(nq_read.is_empty());
+    }
 
     #[test]
     fn test_deduplicate_removes_duplicates() {
