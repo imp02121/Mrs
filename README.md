@@ -30,16 +30,100 @@ The School Run Strategy is a mechanical breakout trading strategy created by Tom
 
 ## Quick Start
 
-> Coming soon. The project is under active development.
->
-> Once Phase 0 is complete, the quick start will cover:
->
-> ```bash
-> git clone https://github.com/<owner>/sr.git
-> cd sr
-> cargo build --workspace
-> cd dashboard && npm install && npm run dev
-> ```
+```bash
+git clone https://github.com/<owner>/sr.git
+cd sr
+cargo build --workspace
+```
+
+## Backtesting
+
+The backtest engine runs the School Run Strategy over historical candle data and produces trade logs, equity curves, and statistical summaries.
+
+### Running a Backtest (Rust API)
+
+```rust
+use sr_engine::backtest::{run_backtest, BacktestResult};
+use sr_engine::models::Instrument;
+use sr_engine::strategy::StrategyConfig;
+
+let config = StrategyConfig {
+    instrument: Instrument::Dax,
+    date_from: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
+    date_to: NaiveDate::from_ymd_opt(2024, 12, 31).unwrap(),
+    ..StrategyConfig::default()
+};
+
+let result: BacktestResult = run_backtest(&candles, Instrument::Dax, &config);
+
+println!("Trades: {}", result.trade_count());
+println!("Final equity: {}", result.final_equity());
+println!("{}", result.stats); // Sharpe, drawdown, win rate, etc.
+```
+
+### JSON Configuration
+
+Strategy parameters can be deserialized from JSON:
+
+```json
+{
+  "instrument": "Dax",
+  "signal_bar_index": 2,
+  "entry_offset_points": "2",
+  "sl_mode": "FixedPoints",
+  "sl_fixed_points": "40",
+  "exit_mode": "EndOfDay",
+  "exit_eod_time": "17:30:00",
+  "date_from": "2024-01-01",
+  "date_to": "2024-12-31",
+  "initial_capital": "100000",
+  "position_size": "1",
+  "slippage_points": "0.5"
+}
+```
+
+### Parameter Sweep
+
+Sweep across multiple parameter values in parallel:
+
+```rust
+use sr_engine::backtest::{run_sweep, SweepConfig, best_by};
+
+let sweep = SweepConfig {
+    sl_fixed_points: vec![dec!(20), dec!(30), dec!(40), dec!(50)],
+    entry_offset_points: vec![dec!(1), dec!(2), dec!(3)],
+    ..Default::default()
+};
+
+let results = run_sweep(&candles, Instrument::Dax, &base_config, &sweep);
+
+// Find the best result by Sharpe ratio
+if let Some(best) = best_by(&results, |stats| stats.sharpe_ratio) {
+    println!("Best Sharpe: {:.2}", best.result.stats.sharpe_ratio);
+    println!("Config: SL={}, Offset={}", best.config.sl_fixed_points, best.config.entry_offset_points);
+}
+```
+
+### Backtest Statistics
+
+Each backtest produces a `BacktestStats` summary:
+
+| Metric | Type | Description |
+|---|---|---|
+| `total_trades` | `u32` | Total completed trades |
+| `win_rate` | `f64` | Fraction of winning trades |
+| `total_pnl` | `Decimal` | Net profit/loss |
+| `profit_factor` | `f64` | Gross wins / gross losses |
+| `max_drawdown` | `Decimal` | Peak-to-trough equity drawdown |
+| `max_drawdown_pct` | `f64` | Drawdown as percentage of peak |
+| `sharpe_ratio` | `f64` | Annualised Sharpe (daily returns, rf=0) |
+| `sortino_ratio` | `f64` | Annualised Sortino (downside only) |
+| `calmar_ratio` | `f64` | Annualised return / max drawdown |
+| `max_consecutive_wins` | `u32` | Longest winning streak |
+| `max_consecutive_losses` | `u32` | Longest losing streak |
+| `avg_trade_duration_minutes` | `f64` | Average time in trade |
+
+See [docs/strategy.md](docs/strategy.md) for full parameter reference and strategy details.
 
 ## Architecture
 
@@ -102,6 +186,7 @@ The pipeline handles rate limiting (8 req/min on free tier), automatic paginatio
 | [docs/data-pipeline.md](docs/data-pipeline.md) | Data pipeline architecture and design |
 | [docs/deployment.md](docs/deployment.md) | Deployment guide and environment configuration |
 | [data/README.md](data/README.md) | How to obtain and format historical candle data |
+| [CHANGELOG.md](CHANGELOG.md) | Version history and release notes |
 
 ## Contributing
 

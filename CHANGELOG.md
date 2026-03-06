@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Backtest engine (Phase 3)
+  - Core backtest loop (`run_backtest`) with day-by-day iteration over candles applying the School Run Strategy
+  - Candle grouping by trading date using instrument's exchange timezone
+  - Signal bar detection, order generation, fill simulation, and position tracking per session
+  - Signal expiry: cancel unfilled orders after a configurable time
+  - Force-close open positions at end of day
+  - Deterministic: same candles + config always produce the same result
+  - `BacktestResult` struct with trades, equity curve, daily PnL, and computed statistics
+  - `EquityPoint` and `DailyPnl` types for equity curve and daily profit tracking
+  - `BacktestStats` with comprehensive metrics: win rate, profit factor, Sharpe ratio, Sortino ratio, Calmar ratio, max drawdown (absolute and percentage), consecutive win/loss streaks, average trade duration, and long/short breakdown
+  - Edge case handling: zero trades, all wins, all losses, single trade, zero standard deviation
+  - Parameter sweep (`SweepConfig`, `run_sweep`) with Cartesian product of configurable axes: stop loss distance, entry offset, trailing stop distance, add-to-winners interval, signal bar index
+  - Parallel sweep execution using Rayon with configurable thread count
+  - `best_by` helper for finding the best sweep result by any metric
+  - Report module with JSON serialization (`to_json`, `to_json_compact`) and `BacktestSummary` display formatting
+  - `Display` impl for `BacktestStats` for human-readable output
+  - Comprehensive unit tests for all backtest modules
+
 - Core strategy engine (Phase 2)
   - `StrategyConfig` struct with all configurable parameters (signal detection, stop loss, exit, adding to winners, session timing, backtest scope) using `Decimal` for financial values
   - `Direction`, `StopLossMode`, `ExitMode`, `PositionStatus` enums with serde and Display
