@@ -1,0 +1,17 @@
+# Rust
+/target
+
+# Data files
+/data/*.parquet
+/data/**/*.parquet
+
+# Dashboard
+/dashboard/node_modules
+/dashboard/dist
+
+# Environment
+.env
+.env.local
+
+# OS
+*.DS_Store
