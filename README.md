@@ -69,6 +69,27 @@ Browser (Dashboard)          Telegram Client
              Valkey     PostgreSQL
 ```
 
+## Data Pipeline
+
+The engine fetches historical 15-minute OHLCV candle data from the [Twelve Data](https://twelvedata.com) API and stores it locally in Parquet files and optionally in PostgreSQL.
+
+```
+Twelve Data API  -->  DataFetcher  -->  ParquetStore (data/{instrument}/{YYYY-MM}.parquet)
+                                   -->  PostgresStore (candles table, upsert)
+```
+
+**Setup:**
+
+```bash
+# Set your Twelve Data API key
+export TWELVE_DATA_API_KEY=your_key_here
+
+# Fetch 24 months of DAX data
+sr-engine fetch --instrument DAX --months 24
+```
+
+The pipeline handles rate limiting (8 req/min on free tier), automatic pagination for long date ranges, exponential backoff on transient errors, and DST-aware timestamp normalization. See [data/README.md](data/README.md) for full details and [docs/data-pipeline.md](docs/data-pipeline.md) for architecture.
+
 ## Documentation
 
 | Document | Description |
@@ -78,6 +99,7 @@ Browser (Dashboard)          Telegram Client
 | [docs/strategy.md](docs/strategy.md) | Strategy guide (how the School Run strategy works) |
 | [docs/api.md](docs/api.md) | API reference for the Engine HTTP endpoints |
 | [docs/architecture.md](docs/architecture.md) | System architecture and design decisions |
+| [docs/data-pipeline.md](docs/data-pipeline.md) | Data pipeline architecture and design |
 | [docs/deployment.md](docs/deployment.md) | Deployment guide and environment configuration |
 | [data/README.md](data/README.md) | How to obtain and format historical candle data |
 

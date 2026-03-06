@@ -48,5 +48,9 @@ axum = "0.8"
 tower = "0.5"
 tower-http = { version = "0.6", features = ["cors", "trace", "compression-gzip", "timeout"] }
 
+# Data storage
+arrow = "54"
+parquet = { version = "54", features = ["async"] }
+
 # Telegram bot
 teloxide = { version = "0.13", features = ["macros"] }
