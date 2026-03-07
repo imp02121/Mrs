@@ -13,6 +13,8 @@
 //! - **Configs** (`/api/configs/*`) — CRUD for strategy configurations
 //! - **Data** (`/api/data/*`) — instruments list, candle queries, data fetch trigger
 //! - **Signals** (`/api/signals/*`) — today's signals, latest signal per instrument
+//! - **Export** (`/api/backtest/:id/export/*`) — CSV download of backtest trades
+//! - **WebSocket** (`/ws/signals`) — real-time signal streaming
 //!
 //! All responses use [`ApiResponse`] or [`PaginatedResponse`] wrappers.
 //! Errors are returned as [`ApiError`] with structured JSON bodies.
@@ -21,10 +23,12 @@ pub mod backtest;
 pub mod configs;
 pub mod data;
 pub mod error;
+pub mod export;
 pub mod response;
 pub mod router;
 pub mod signals;
 pub mod state;
+pub mod ws;
 
 pub use error::ApiError;
 pub use response::{ApiResponse, PaginatedResponse, Pagination, PaginationParams};

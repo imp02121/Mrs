@@ -1,8 +1,10 @@
 //! Router assembly and middleware configuration.
 //!
 //! [`api_routes`] builds the complete Axum [`Router`] with all endpoint
-//! groups nested under `/api` and middleware layers applied.
+//! groups nested under `/api` and middleware layers applied. WebSocket
+//! routes are mounted at the top level outside `/api`.
 
+use std::sync::Arc;
 use std::time::Duration;
 
 use axum::Router;
@@ -13,25 +15,36 @@ use tower_http::timeout::TimeoutLayer;
 use tower_http::trace::TraceLayer;
 
 use super::state::AppState;
+use super::ws::SignalBroadcaster;
 
 /// Build the complete API router with all routes and middleware.
 ///
 /// Mounts sub-routers under `/api`:
 /// - `/api/health` — health check
-/// - `/api/backtest` — backtest endpoints (Task #2)
-/// - `/api/configs` — config CRUD (Task #2)
-/// - `/api/data` — data endpoints (Task #3)
-/// - `/api/signals` — signal endpoints (Task #3)
+/// - `/api/backtest` — backtest endpoints
+/// - `/api/backtest/:id/export` — CSV export
+/// - `/api/configs` — config CRUD
+/// - `/api/data` — data endpoints
+/// - `/api/signals` — signal endpoints
+///
+/// And WebSocket routes at the top level:
+/// - `/ws/signals` — real-time signal streaming
 pub fn api_routes(state: AppState) -> Router {
+    let broadcaster = Arc::new(SignalBroadcaster::new(state.clone()));
+
+    let backtest =
+        super::backtest::backtest_routes().nest("/{id}/export", super::export::export_routes());
+
     let api = Router::new()
         .route("/health", get(health))
-        .nest("/backtest", super::backtest::backtest_routes())
+        .nest("/backtest", backtest)
         .nest("/configs", super::configs::config_routes())
         .nest("/data", super::data::data_routes())
         .nest("/signals", super::signals::signal_routes());
 
     Router::new()
         .nest("/api", api)
+        .merge(super::ws::ws_routes(broadcaster))
         .layer(CompressionLayer::new())
         .layer(TimeoutLayer::with_status_code(
             axum::http::StatusCode::REQUEST_TIMEOUT,

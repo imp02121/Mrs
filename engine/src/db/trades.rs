@@ -97,6 +97,31 @@ pub async fn insert_trades(pool: &PgPool, trades: &[InsertTrade]) -> Result<usiz
     Ok(total)
 }
 
+/// Fetch all trades for a backtest run (no pagination).
+///
+/// Used for CSV export where all trades must be included.
+///
+/// # Errors
+///
+/// Returns [`DbError::Database`] on SQL failure.
+pub async fn get_all_trades_for_run(pool: &PgPool, run_id: Uuid) -> Result<Vec<TradeRow>, DbError> {
+    let rows = sqlx::query_as::<_, TradeRow>(
+        r#"
+        SELECT id, backtest_run_id, instrument_id, direction,
+               entry_price, entry_time, exit_price, exit_time,
+               stop_loss, exit_reason, pnl_points, pnl_with_adds,
+               adds, trade_date
+        FROM trades
+        WHERE backtest_run_id = $1
+        ORDER BY entry_time ASC
+        "#,
+    )
+    .bind(run_id)
+    .fetch_all(pool)
+    .await?;
+    Ok(rows)
+}
+
 /// Fetch trades for a backtest run with pagination.
 ///
 /// # Errors
