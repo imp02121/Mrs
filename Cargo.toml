@@ -1,5 +1,5 @@
 [workspace]
-members = ["engine", "telegram"]
+members = ["engine", "telegram", "auth"]
 resolver = "2"
 
 [workspace.package]

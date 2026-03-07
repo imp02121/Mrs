@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Auth microservice (Phase 6a)
+  - Standalone `auth/` crate (Rust/Axum) serving OTP-based authentication on port 3002
+  - Whitelist-only login: only pre-approved emails in `allowed_emails` table can authenticate
+  - OTP generation with cryptographically secure random 6-digit codes (`OsRng`)
+  - Argon2id hashing for stored OTPs (never plaintext in the database)
+  - 5-minute OTP TTL with 3 max verification attempts per code
+  - JWT authentication (HS256, 24-hour expiry) with `sub`, `role`, `exp`, `iat` claims
+  - In-memory sliding window rate limiting via `dashmap` (per-email, per-IP, global)
+  - Resend transactional email integration for OTP delivery
+  - Development mode: console OTP fallback when `RESEND_API_KEY` is unset
+  - Anti-enumeration: `POST /auth/request-otp` returns identical responses regardless of email validity
+  - Endpoints: `POST /auth/request-otp`, `POST /auth/verify-otp`, `GET /auth/me`, `POST /auth/logout`
+  - `AuthError` enum with `IntoResponse` producing structured JSON errors
+  - Migration 008: `allowed_emails` table with role-based access (viewer/admin)
+  - Migration 009: `otp_requests` table with partial index on active OTPs
+  - Auth service reference documentation (`docs/auth.md`)
+
 - HTTP API with Axum (Phase 5)
   - REST API served via `sr-engine serve`, default bind `0.0.0.0:3001`
   - `AppState` with `PgPool` and optional `ValkeyCache` for shared handler state
