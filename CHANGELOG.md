@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Docker and deployment (Phase 8)
+  - Production Dockerfiles with multi-stage builds and dependency caching for engine, auth, telegram, and dashboard
+  - Auth service Dockerfile (`auth/Dockerfile`) with the same multi-stage pattern as engine and telegram
+  - nginx reverse proxy configuration (`dashboard/nginx.conf`) with `/api/` proxying to the engine, SPA routing, and standard proxy headers
+  - Comprehensive deployment documentation (`docs/deployment.md`) covering all 4 services, environment variables, quick start, networking, production considerations, and troubleshooting
+  - Contributor guide (`CONTRIBUTING.md`) with development setup, code style, commit conventions, and PR workflow
+
 - Telegram notification bot (Phase 7)
   - Teloxide-based bot with 5 commands: `/start`, `/signals`, `/subscribe`, `/unsubscribe`, `/status`
   - Push notifications for 4 signal event types: signal bar formed, order triggered, trade closed, daily summary

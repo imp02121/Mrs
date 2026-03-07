@@ -36,6 +36,38 @@ cd sr
 cargo build --workspace
 ```
 
+## Docker Deployment
+
+Each service runs as an independent Docker container. See [docs/deployment.md](docs/deployment.md) for the full deployment guide.
+
+```bash
+# Start infrastructure
+docker run -d --name sr-postgres \
+  -e POSTGRES_USER=sr -e POSTGRES_PASSWORD=sr_dev -e POSTGRES_DB=school_run \
+  -p 5432:5432 postgres:16-alpine
+
+docker run -d --name sr-valkey -p 6379:6379 valkey/valkey:8-alpine
+
+# Build and run services
+docker build -t sr-engine -f engine/Dockerfile .
+docker run -d --name sr-engine \
+  -e DATABASE_URL=postgres://sr:sr_dev@host.docker.internal:5432/school_run \
+  -p 3001:3001 sr-engine
+
+docker build -t sr-auth -f auth/Dockerfile .
+docker run -d --name sr-auth \
+  -e AUTH_DATABASE_URL=postgres://sr:sr_dev@host.docker.internal:5432/school_run \
+  -e JWT_SECRET=change-me-to-a-random-string-at-least-32-bytes \
+  -p 3002:3002 sr-auth
+
+docker build -t sr-dashboard -f dashboard/Dockerfile dashboard/
+docker run -d --name sr-dashboard -p 3000:80 sr-dashboard
+
+# Run migrations and verify
+docker exec sr-engine sr-engine migrate
+curl http://localhost:3001/api/health
+```
+
 ## Backtesting
 
 The backtest engine runs the School Run Strategy over historical candle data and produces trade logs, equity curves, and statistical summaries.
@@ -184,19 +216,16 @@ The pipeline handles rate limiting (8 req/min on free tier), automatic paginatio
 | [docs/api.md](docs/api.md) | API reference for the Engine HTTP endpoints |
 | [docs/architecture.md](docs/architecture.md) | System architecture and design decisions |
 | [docs/data-pipeline.md](docs/data-pipeline.md) | Data pipeline architecture and design |
+| [docs/auth.md](docs/auth.md) | Auth service reference (OTP, JWT, rate limiting) |
+| [docs/telegram.md](docs/telegram.md) | Telegram bot reference (commands, notifications) |
 | [docs/deployment.md](docs/deployment.md) | Deployment guide and environment configuration |
 | [data/README.md](data/README.md) | How to obtain and format historical candle data |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute (setup, style, PR workflow) |
 | [CHANGELOG.md](CHANGELOG.md) | Version history and release notes |
 
 ## Contributing
 
-Contributions are welcome. A full contributing guide (`CONTRIBUTING.md`) is planned for Phase 8. In the meantime:
-
-1. Fork the repository
-2. Create a feature branch (`feat/your-feature`)
-3. Follow the conventions in [CLAUDE.md](CLAUDE.md)
-4. Ensure `cargo fmt`, `cargo clippy -- -D warnings`, and `cargo test` pass
-5. Open a pull request with a clear description
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide covering development setup, code style, commit conventions, and pull request workflow.
 
 ## License
 
