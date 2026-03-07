@@ -26,7 +26,7 @@ RUN cargo build --release --bin sr-telegram 2>/dev/null || true
 COPY engine/ engine/
 COPY telegram/ telegram/
 COPY auth/ auth/
-RUN touch telegram/src/main.rs && cargo build --release --bin sr-telegram
+RUN touch telegram/src/main.rs telegram/src/lib.rs && cargo build --release --bin sr-telegram
 
 FROM debian:bookworm-slim
 

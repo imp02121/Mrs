@@ -26,7 +26,7 @@ RUN cargo build --release --bin sr-engine 2>/dev/null || true
 COPY engine/ engine/
 COPY telegram/ telegram/
 COPY auth/ auth/
-RUN touch engine/src/main.rs && cargo build --release --bin sr-engine
+RUN touch engine/src/main.rs engine/src/lib.rs && cargo build --release --bin sr-engine
 
 FROM debian:bookworm-slim
 

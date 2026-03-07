@@ -26,7 +26,7 @@ RUN cargo build --release --bin sr-auth 2>/dev/null || true
 COPY engine/ engine/
 COPY telegram/ telegram/
 COPY auth/ auth/
-RUN touch auth/src/main.rs && cargo build --release --bin sr-auth
+RUN touch auth/src/main.rs auth/src/lib.rs && cargo build --release --bin sr-auth
 
 FROM debian:bookworm-slim
 
