@@ -329,3 +329,64 @@ Get the most recent signal for a specific instrument. The `instrument` path segm
 **Response:** `200 OK` with a single `SignalRow`.
 
 **Errors:** `400` unknown instrument, `404` no signal found.
+
+---
+
+### Export
+
+#### `GET /api/backtest/{id}/export/csv`
+
+Download all trades for a backtest run as a CSV file.
+
+**Response:** `200 OK`
+
+Headers:
+- `Content-Type: text/csv`
+- `Content-Disposition: attachment; filename="backtest_{id}.csv"`
+
+CSV columns: `date`, `instrument`, `direction`, `entry_price`, `exit_price`, `stop_loss`, `pnl`, `duration_minutes`, `entry_time`, `exit_time`.
+
+**Errors:** `404` run not found.
+
+---
+
+### WebSocket
+
+#### `GET /ws/signals`
+
+Real-time signal streaming via WebSocket. This endpoint is mounted outside the `/api` prefix.
+
+On connect, the server sends an initial snapshot of today's signals. It then polls the database every 10 seconds and pushes updates whenever the signal data changes.
+
+**Message types:**
+
+Initial snapshot (sent on connect):
+```json
+{
+  "type": "signals",
+  "data": [
+    {
+      "id": "uuid",
+      "instrument_id": 1,
+      "signal_date": "2024-06-15",
+      "signal_bar_high": "16050.00",
+      "signal_bar_low": "15980.00",
+      "buy_level": "16052.00",
+      "sell_level": "15978.00",
+      "status": "pending",
+      "fill_details": null,
+      "created_at": "2024-06-15T08:30:00Z"
+    }
+  ]
+}
+```
+
+Subsequent updates (sent when signals change):
+```json
+{
+  "type": "signal_update",
+  "data": [ ... ]
+}
+```
+
+The `data` array contains the full current set of today's signals (same shape as `GET /api/signals/today`). Updates are only sent when the data differs from the previous poll.

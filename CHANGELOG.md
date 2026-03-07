@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Near-term features (Phase 9)
+  - Parameter sweep UI (`/optimize`) with two-axis range selectors, Cartesian product execution, and color-coded heatmap visualization (PnL/Sharpe toggle)
+  - CSV export endpoint (`GET /api/backtest/:id/export/csv`) for downloading backtest trades with Content-Type and Content-Disposition headers
+  - WebSocket signal streaming endpoint (`GET /ws/signals`) with initial snapshot on connect and change-detected updates every 10 seconds
+  - Export buttons on backtest results: CSV download and Print Report
+  - Mobile responsive layout with hamburger menu, stacking layouts, and responsive grids
+  - Print-friendly CSS for report generation (`@media print`)
+
 - Docker and deployment (Phase 8)
   - Production Dockerfiles with multi-stage builds and dependency caching for engine, auth, telegram, and dashboard
   - Auth service Dockerfile (`auth/Dockerfile`) with the same multi-stage pattern as engine and telegram
