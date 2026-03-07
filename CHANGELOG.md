@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Telegram notification bot (Phase 7)
+  - Teloxide-based bot with 5 commands: `/start`, `/signals`, `/subscribe`, `/unsubscribe`, `/status`
+  - Push notifications for 4 signal event types: signal bar formed, order triggered, trade closed, daily summary
+  - Background signal polling loop against `GET /api/signals/today` with configurable interval (`POLL_INTERVAL_SECS`, default 30s)
+  - `SignalWatcher` for in-memory change detection (new signals and status transitions)
+  - Subscriber management via PostgreSQL `subscribers` table (insert, get, update subscriptions, activate/deactivate)
+  - Instrument-filtered notification delivery (only subscribers of the affected instrument are notified)
+  - `BotError` enum with thiserror for Database, Http, Config, Json, and InvalidInstrument errors
+  - `Config` loaded from environment variables (`TELEGRAM_BOT_TOKEN`, `DATABASE_URL`, `ENGINE_API_URL`, `VALKEY_URL`, `POLL_INTERVAL_SECS`)
+  - Number-formatting with thousand separators for financial values in messages
+  - Telegram bot reference documentation (`docs/telegram.md`)
+  - 8 source files, 2,317 lines of Rust
+
 - React dashboard (Phase 6b)
   - 6 pages: Backtest (`/`), Compare (`/compare`), History (`/history`), Signals (`/signals`), Data (`/data`), Login (`/login`)
   - OTP login page with auto-advance 6-digit input, paste support, and 60-second resend cooldown
