@@ -2,10 +2,15 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+ARG VITE_API_URL=/api
+ARG VITE_AUTH_URL=/auth
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_AUTH_URL=$VITE_AUTH_URL
 RUN npm run build
 
 FROM nginx:alpine
