@@ -11,8 +11,8 @@ export default function BacktestPage() {
   };
 
   return (
-    <div className="flex gap-6">
-      <div className="w-[360px] shrink-0">
+    <div className="flex flex-col lg:flex-row gap-6">
+      <div className="w-full lg:w-[360px] shrink-0">
         <ConfigPanel onResult={handleResult} />
       </div>
       <div className="flex-1 min-w-0">

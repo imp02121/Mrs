@@ -1,11 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CreateConfigRequest } from "@/types/index.ts";
-import {
-  listConfigs,
-  getConfig,
-  createConfig,
-  deleteConfig,
-} from "@/api/endpoints.ts";
+import { listConfigs, getConfig, createConfig, deleteConfig } from "@/api/endpoints.ts";
 
 /** Query: list all saved configs. */
 export function useConfigs() {

@@ -12,10 +12,7 @@ const INSTRUMENTS: { value: Instrument; label: string }[] = [
   { value: "Dow", label: "Dow 30" },
 ];
 
-export default function InstrumentSelector({
-  value,
-  onChange,
-}: InstrumentSelectorProps) {
+export default function InstrumentSelector({ value, onChange }: InstrumentSelectorProps) {
   return (
     <select
       value={value}

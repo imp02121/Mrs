@@ -1,9 +1,4 @@
-import type {
-  Direction,
-  Instrument,
-  PositionStatus,
-  StrategyConfig,
-} from "./strategy.ts";
+import type { Direction, Instrument, PositionStatus, StrategyConfig } from "./strategy.ts";
 
 /** Request body for `POST /api/backtest/run`. */
 export interface RunBacktestRequest {

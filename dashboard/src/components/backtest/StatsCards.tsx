@@ -31,37 +31,26 @@ function formatPf(pf: number | string): string {
 export default function StatsCards({ stats }: StatsCardsProps) {
   const winRateColor = stats.win_rate >= 50 ? "text-emerald-600" : "text-red-600";
   const pfNum =
-    typeof stats.profit_factor === "string"
-      ? parseFloat(stats.profit_factor)
-      : stats.profit_factor;
-  const pfColor =
-    !isNaN(pfNum) && pfNum >= 1.0 ? "text-emerald-600" : "text-red-600";
+    typeof stats.profit_factor === "string" ? parseFloat(stats.profit_factor) : stats.profit_factor;
+  const pfColor = !isNaN(pfNum) && pfNum >= 1.0 ? "text-emerald-600" : "text-red-600";
   const pnlNum = parseFloat(stats.total_pnl);
   const pnlColor = pnlNum >= 0 ? "text-emerald-600" : "text-red-600";
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       <StatCard label="Total Trades" value={String(stats.total_trades)} />
       <StatCard
         label="Win Rate"
         value={`${stats.win_rate.toFixed(1)}%`}
         colorClass={winRateColor}
       />
-      <StatCard
-        label="Profit Factor"
-        value={formatPf(stats.profit_factor)}
-        colorClass={pfColor}
-      />
+      <StatCard label="Profit Factor" value={formatPf(stats.profit_factor)} colorClass={pfColor} />
       <StatCard
         label="Sharpe Ratio"
         value={stats.sharpe_ratio.toFixed(2)}
         colorClass={stats.sharpe_ratio >= 0 ? "text-emerald-600" : "text-red-600"}
       />
-      <StatCard
-        label="Max Drawdown"
-        value={stats.max_drawdown}
-        colorClass="text-red-600"
-      />
+      <StatCard label="Max Drawdown" value={stats.max_drawdown} colorClass="text-red-600" />
       <StatCard
         label="Net PnL"
         value={pnlNum >= 0 ? `+${stats.total_pnl}` : stats.total_pnl}

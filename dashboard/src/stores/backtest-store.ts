@@ -55,10 +55,7 @@ interface BacktestFormState {
   slippagePoints: string;
 
   // Actions
-  setField: <K extends keyof BacktestFormState>(
-    key: K,
-    value: BacktestFormState[K],
-  ) => void;
+  setField: <K extends keyof BacktestFormState>(key: K, value: BacktestFormState[K]) => void;
   reset: () => void;
   toRequest: () => RunBacktestRequest;
 }

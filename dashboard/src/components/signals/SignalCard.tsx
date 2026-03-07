@@ -25,9 +25,7 @@ export default function SignalCard({ instrumentName, signal }: SignalCardProps) 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {instrumentName}
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900">{instrumentName}</h3>
         {signal && <StatusBadge status={signal.status} />}
       </div>
 
@@ -40,15 +38,11 @@ export default function SignalCard({ instrumentName, signal }: SignalCardProps) 
           <div className="grid grid-cols-2 gap-3">
             <div>
               <p className="text-gray-500 text-xs">High</p>
-              <p className="font-mono tabular-nums text-gray-900">
-                {signal.signal_bar_high}
-              </p>
+              <p className="font-mono tabular-nums text-gray-900">{signal.signal_bar_high}</p>
             </div>
             <div>
               <p className="text-gray-500 text-xs">Low</p>
-              <p className="font-mono tabular-nums text-gray-900">
-                {signal.signal_bar_low}
-              </p>
+              <p className="font-mono tabular-nums text-gray-900">{signal.signal_bar_low}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -60,9 +54,7 @@ export default function SignalCard({ instrumentName, signal }: SignalCardProps) 
             </div>
             <div>
               <p className="text-gray-500 text-xs">Sell Level</p>
-              <p className="font-mono tabular-nums text-red-600 font-medium">
-                {signal.sell_level}
-              </p>
+              <p className="font-mono tabular-nums text-red-600 font-medium">{signal.sell_level}</p>
             </div>
           </div>
         </div>

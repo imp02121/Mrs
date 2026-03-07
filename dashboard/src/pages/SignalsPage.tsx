@@ -29,9 +29,7 @@ export default function SignalsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">
-          {"Today's Signals"}
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900">{"Today's Signals"}</h2>
         <span className="text-sm text-gray-500">{today}</span>
       </div>
 
@@ -42,11 +40,7 @@ export default function SignalsPage() {
       ) : (
         <div className="grid grid-cols-2 gap-6">
           {INSTRUMENTS.map((inst) => (
-            <SignalCard
-              key={inst.id}
-              instrumentName={inst.name}
-              signal={signalMap.get(inst.id)}
-            />
+            <SignalCard key={inst.id} instrumentName={inst.name} signal={signalMap.get(inst.id)} />
           ))}
         </div>
       )}

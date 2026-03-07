@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -23,14 +23,11 @@ const columns = [
     cell: (info) => info.row.index + 1,
     size: 50,
   }),
-  columnHelper.accessor(
-    (row) => row.entry_time.slice(0, 10),
-    {
-      id: "date",
-      header: "Date",
-      size: 100,
-    },
-  ),
+  columnHelper.accessor((row) => row.entry_time.slice(0, 10), {
+    id: "date",
+    header: "Date",
+    size: 100,
+  }),
   columnHelper.accessor("direction", {
     header: "Dir",
     size: 70,
@@ -39,9 +36,7 @@ const columns = [
       return (
         <span
           className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${
-            dir === "Long"
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-red-100 text-red-700"
+            dir === "Long" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
           }`}
         >
           {dir}
@@ -52,23 +47,17 @@ const columns = [
   columnHelper.accessor("entry_price", {
     header: "Entry",
     size: 90,
-    cell: (info) => (
-      <span className="font-mono tabular-nums">{info.getValue()}</span>
-    ),
+    cell: (info) => <span className="font-mono tabular-nums">{info.getValue()}</span>,
   }),
   columnHelper.accessor("exit_price", {
     header: "Exit",
     size: 90,
-    cell: (info) => (
-      <span className="font-mono tabular-nums">{info.getValue()}</span>
-    ),
+    cell: (info) => <span className="font-mono tabular-nums">{info.getValue()}</span>,
   }),
   columnHelper.accessor("stop_loss", {
     header: "SL",
     size: 90,
-    cell: (info) => (
-      <span className="font-mono tabular-nums">{info.getValue()}</span>
-    ),
+    cell: (info) => <span className="font-mono tabular-nums">{info.getValue()}</span>,
   }),
   columnHelper.accessor("pnl_points", {
     header: "PnL",
@@ -85,8 +74,7 @@ const columns = [
         </span>
       );
     },
-    sortingFn: (a, b) =>
-      parseFloat(a.original.pnl_points) - parseFloat(b.original.pnl_points),
+    sortingFn: (a, b) => parseFloat(a.original.pnl_points) - parseFloat(b.original.pnl_points),
   }),
   columnHelper.accessor("exit_reason", {
     header: "Exit Reason",
@@ -129,10 +117,7 @@ export default function TradeTable({ trades }: TradeTableProps) {
                     style={{ width: header.getSize() }}
                   >
                     <div className="flex items-center gap-1">
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                      {flexRender(header.column.columnDef.header, header.getContext())}
                       {{
                         asc: " \u2191",
                         desc: " \u2193",
@@ -145,10 +130,7 @@ export default function TradeTable({ trades }: TradeTableProps) {
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="border-b border-gray-100 hover:bg-gray-100/50"
-              >
+              <tr key={row.id} className="border-b border-gray-100 hover:bg-gray-100/50">
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="py-1.5 px-2 text-gray-700">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -31,12 +31,7 @@ export type {
 
 export type { SignalRow } from "./signal.ts";
 
-export type {
-  InstrumentRow,
-  CandleRow,
-  CandleQuery,
-  FetchRequest,
-} from "./data.ts";
+export type { InstrumentRow, CandleRow, CandleQuery, FetchRequest } from "./data.ts";
 
 export type {
   ConfigRow,

@@ -2,12 +2,7 @@
 export type StopLossMode = "SignalBarExtreme" | "FixedPoints" | "Midpoint";
 
 /** How and when positions are exited. Mirrors Rust `ExitMode`. */
-export type ExitMode =
-  | "EndOfDay"
-  | "TrailingStop"
-  | "FixedTakeProfit"
-  | "CloseAtTime"
-  | "None";
+export type ExitMode = "EndOfDay" | "TrailingStop" | "FixedTakeProfit" | "CloseAtTime" | "None";
 
 /** Trade direction. Mirrors Rust `Direction`. */
 export type Direction = "Long" | "Short";

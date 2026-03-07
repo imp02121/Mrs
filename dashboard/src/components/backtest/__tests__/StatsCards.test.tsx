@@ -55,7 +55,7 @@ describe("StatsCards", () => {
   });
 
   it("should show emerald/green styling for positive win rate (>=50)", () => {
-    const { container } = render(<StatsCards stats={makeStats({ win_rate: 60.0 })} />);
+    render(<StatsCards stats={makeStats({ win_rate: 60.0 })} />);
     const winRateValue = screen.getByText("60.0%");
     expect(winRateValue.className).toContain("text-emerald-600");
   });

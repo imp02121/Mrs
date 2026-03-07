@@ -17,9 +17,7 @@ const columns = [
   columnHelper.accessor("id", {
     header: "Run ID",
     cell: (info) => (
-      <span className="font-mono text-xs text-gray-600">
-        {info.getValue().slice(0, 8)}...
-      </span>
+      <span className="font-mono text-xs text-gray-600">{info.getValue().slice(0, 8)}...</span>
     ),
     size: 110,
   }),
@@ -36,36 +34,27 @@ const columns = [
     },
     size: 100,
   }),
-  columnHelper.accessor(
-    (row) => `${row.start_date} - ${row.end_date}`,
-    {
-      id: "date_range",
-      header: "Date Range",
-      size: 180,
-    },
-  ),
+  columnHelper.accessor((row) => `${row.start_date} - ${row.end_date}`, {
+    id: "date_range",
+    header: "Date Range",
+    size: 180,
+  }),
   columnHelper.accessor("total_trades", {
     header: "Trades",
-    cell: (info) => (
-      <span className="font-mono tabular-nums">{info.getValue()}</span>
-    ),
+    cell: (info) => <span className="font-mono tabular-nums">{info.getValue()}</span>,
     size: 80,
   }),
   columnHelper.accessor("duration_ms", {
     header: "Duration",
     cell: (info) => (
-      <span className="font-mono tabular-nums text-gray-500">
-        {info.getValue()}ms
-      </span>
+      <span className="font-mono tabular-nums text-gray-500">{info.getValue()}ms</span>
     ),
     size: 90,
   }),
   columnHelper.accessor("created_at", {
     header: "Created",
     cell: (info) => (
-      <span className="text-gray-500 text-xs">
-        {new Date(info.getValue()).toLocaleString()}
-      </span>
+      <span className="text-gray-500 text-xs">{new Date(info.getValue()).toLocaleString()}</span>
     ),
     size: 160,
   }),
@@ -91,9 +80,7 @@ export default function HistoryPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        Backtest History
-      </h2>
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">Backtest History</h2>
 
       {isLoading ? (
         <div className="flex items-center justify-center h-40 text-gray-400 text-sm">
@@ -118,10 +105,7 @@ export default function HistoryPage() {
                         style={{ width: header.getSize() }}
                       >
                         <div className="flex items-center gap-1">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          {flexRender(header.column.columnDef.header, header.getContext())}
                           {{
                             asc: " \u2191",
                             desc: " \u2193",
@@ -141,10 +125,7 @@ export default function HistoryPage() {
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="py-2 px-3 text-gray-700">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
                   </tr>
@@ -167,11 +148,7 @@ export default function HistoryPage() {
                   Prev
                 </button>
                 <button
-                  onClick={() =>
-                    setPage((p) =>
-                      Math.min(pagination.total_pages - 1, p + 1),
-                    )
-                  }
+                  onClick={() => setPage((p) => Math.min(pagination.total_pages - 1, p + 1))}
                   disabled={page >= pagination.total_pages - 1}
                   className="px-3 py-1 rounded border border-gray-200 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
                 >

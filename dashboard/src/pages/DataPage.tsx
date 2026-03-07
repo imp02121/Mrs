@@ -81,39 +81,21 @@ export default function DataPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                  Symbol
-                </th>
-                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                  Name
-                </th>
-                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                  Open
-                </th>
-                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                  Close
-                </th>
-                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                  Timezone
-                </th>
+                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Symbol</th>
+                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Name</th>
+                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Open</th>
+                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Close</th>
+                <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Timezone</th>
               </tr>
             </thead>
             <tbody>
               {instruments.map((inst) => (
                 <tr key={inst.id} className="border-b border-gray-100">
-                  <td className="py-1.5 px-3 font-mono font-medium text-gray-900">
-                    {inst.symbol}
-                  </td>
+                  <td className="py-1.5 px-3 font-mono font-medium text-gray-900">{inst.symbol}</td>
                   <td className="py-1.5 px-3 text-gray-700">{inst.name}</td>
-                  <td className="py-1.5 px-3 font-mono text-gray-600">
-                    {inst.open_time_local}
-                  </td>
-                  <td className="py-1.5 px-3 font-mono text-gray-600">
-                    {inst.close_time_local}
-                  </td>
-                  <td className="py-1.5 px-3 text-gray-500 text-xs">
-                    {inst.timezone}
-                  </td>
+                  <td className="py-1.5 px-3 font-mono text-gray-600">{inst.open_time_local}</td>
+                  <td className="py-1.5 px-3 font-mono text-gray-600">{inst.close_time_local}</td>
+                  <td className="py-1.5 px-3 text-gray-500 text-xs">{inst.timezone}</td>
                 </tr>
               ))}
             </tbody>
@@ -124,14 +106,10 @@ export default function DataPage() {
       </div>
 
       <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">
-          Candle Explorer
-        </h3>
+        <h3 className="text-sm font-medium text-gray-700 mb-3">Candle Explorer</h3>
         <div className="flex items-end gap-3 mb-4">
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              Instrument
-            </label>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Instrument</label>
             <select
               value={formInstrument}
               onChange={(e) => setFormInstrument(e.target.value)}
@@ -144,9 +122,7 @@ export default function DataPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              From
-            </label>
+            <label className="block text-xs font-medium text-gray-500 mb-1">From</label>
             <input
               type="date"
               value={formFrom}
@@ -155,9 +131,7 @@ export default function DataPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              To
-            </label>
+            <label className="block text-xs font-medium text-gray-500 mb-1">To</label>
             <input
               type="date"
               value={formTo}
@@ -173,9 +147,7 @@ export default function DataPage() {
           </button>
         </div>
 
-        {loadingCandles && (
-          <p className="text-sm text-gray-400">Loading candles...</p>
-        )}
+        {loadingCandles && <p className="text-sm text-gray-400">Loading candles...</p>}
 
         {candles && candles.length > 0 && (
           <>
@@ -189,24 +161,12 @@ export default function DataPage() {
               <table className="w-full text-xs">
                 <thead className="sticky top-0 bg-white">
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-1.5 px-2 font-medium text-gray-500">
-                      Timestamp
-                    </th>
-                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">
-                      Open
-                    </th>
-                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">
-                      High
-                    </th>
-                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">
-                      Low
-                    </th>
-                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">
-                      Close
-                    </th>
-                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">
-                      Volume
-                    </th>
+                    <th className="text-left py-1.5 px-2 font-medium text-gray-500">Timestamp</th>
+                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">Open</th>
+                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">High</th>
+                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">Low</th>
+                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">Close</th>
+                    <th className="text-right py-1.5 px-2 font-medium text-gray-500">Volume</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -215,18 +175,10 @@ export default function DataPage() {
                       <td className="py-1 px-2 text-gray-600">
                         {c.timestamp.replace("T", " ").slice(0, 19)}
                       </td>
-                      <td className="py-1 px-2 text-right font-mono tabular-nums">
-                        {c.open}
-                      </td>
-                      <td className="py-1 px-2 text-right font-mono tabular-nums">
-                        {c.high}
-                      </td>
-                      <td className="py-1 px-2 text-right font-mono tabular-nums">
-                        {c.low}
-                      </td>
-                      <td className="py-1 px-2 text-right font-mono tabular-nums">
-                        {c.close}
-                      </td>
+                      <td className="py-1 px-2 text-right font-mono tabular-nums">{c.open}</td>
+                      <td className="py-1 px-2 text-right font-mono tabular-nums">{c.high}</td>
+                      <td className="py-1 px-2 text-right font-mono tabular-nums">{c.low}</td>
+                      <td className="py-1 px-2 text-right font-mono tabular-nums">{c.close}</td>
                       <td className="py-1 px-2 text-right font-mono tabular-nums text-gray-500">
                         {c.volume}
                       </td>
@@ -239,9 +191,7 @@ export default function DataPage() {
         )}
 
         {candles && candles.length === 0 && (
-          <p className="text-sm text-gray-400">
-            No candles found for the selected range
-          </p>
+          <p className="text-sm text-gray-400">No candles found for the selected range</p>
         )}
       </div>
     </div>

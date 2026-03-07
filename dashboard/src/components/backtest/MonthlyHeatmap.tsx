@@ -5,8 +5,18 @@ interface MonthlyHeatmapProps {
 }
 
 const MONTH_LABELS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 interface MonthlyBucket {
@@ -53,25 +63,18 @@ export default function MonthlyHeatmap({ data }: MonthlyHeatmapProps) {
   const maxAbs = Math.max(...buckets.map((b) => Math.abs(b.pnl)), 1);
 
   const years = [...new Set(buckets.map((b) => b.year))].sort();
-  const lookup = new Map(
-    buckets.map((b) => [`${b.year}-${b.month}`, b]),
-  );
+  const lookup = new Map(buckets.map((b) => [`${b.year}-${b.month}`, b]));
 
   return (
     <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">
-        Monthly PnL Heatmap
-      </h3>
+      <h3 className="text-sm font-medium text-gray-700 mb-3">Monthly PnL Heatmap</h3>
       <div className="overflow-x-auto">
         <table className="text-xs">
           <thead>
             <tr>
               <th className="pr-2 text-left text-gray-500 font-medium">Year</th>
               {MONTH_LABELS.map((m) => (
-                <th
-                  key={m}
-                  className="px-1 text-center text-gray-500 font-medium w-14"
-                >
+                <th key={m} className="px-1 text-center text-gray-500 font-medium w-14">
                   {m}
                 </th>
               ))}
@@ -89,9 +92,7 @@ export default function MonthlyHeatmap({ data }: MonthlyHeatmapProps) {
                     <td key={i} className="px-0.5 py-0.5">
                       <div
                         className={`rounded px-1 py-1 text-center font-mono tabular-nums ${
-                          hasData
-                            ? getCellColor(pnl, maxAbs)
-                            : "bg-gray-100 text-gray-300"
+                          hasData ? getCellColor(pnl, maxAbs) : "bg-gray-100 text-gray-300"
                         }`}
                         title={
                           hasData

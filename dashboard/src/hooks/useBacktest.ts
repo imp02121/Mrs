@@ -25,11 +25,7 @@ export function useBacktest(id: string | undefined) {
 }
 
 /** Query: fetch paginated trades for a backtest run. */
-export function useBacktestTrades(
-  id: string | undefined,
-  page = 0,
-  perPage = 50,
-) {
+export function useBacktestTrades(id: string | undefined, page = 0, perPage = 50) {
   return useQuery({
     queryKey: ["backtest-trades", id, page, perPage],
     queryFn: () => getBacktestTrades(id!, page, perPage),

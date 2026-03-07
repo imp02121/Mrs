@@ -132,9 +132,7 @@ export default function LoginPage() {
             <h2 className="text-2xl font-semibold text-gray-900">School Run</h2>
             <p className="text-gray-500 text-sm mt-1 mb-6">Trading Backtester</p>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email"
               value={email}
@@ -145,9 +143,7 @@ export default function LoginPage() {
               className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
 
-            {error && (
-              <p className="mt-2 text-sm text-red-600">{error}</p>
-            )}
+            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
             <button
               type="submit"
@@ -159,9 +155,7 @@ export default function LoginPage() {
           </form>
         ) : (
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Enter your code
-            </h2>
+            <h2 className="text-2xl font-semibold text-gray-900">Enter your code</h2>
             <p className="text-gray-500 text-sm mt-1 mb-6">
               We sent a 6-digit code to {maskEmail(email)}
             </p>
@@ -185,9 +179,7 @@ export default function LoginPage() {
               ))}
             </div>
 
-            {error && (
-              <p className="mt-3 text-sm text-red-600 text-center">{error}</p>
-            )}
+            {error && <p className="mt-3 text-sm text-red-600 text-center">{error}</p>}
 
             <button
               onClick={() => void handleVerify()}

@@ -22,10 +22,11 @@ describe("Sidebar", () => {
     expect(screen.getByText("Trading Backtester")).toBeInTheDocument();
   });
 
-  it("should render all 5 nav links", () => {
+  it("should render all 6 nav links", () => {
     renderSidebar();
     expect(screen.getByText("Backtest")).toBeInTheDocument();
     expect(screen.getByText("Compare")).toBeInTheDocument();
+    expect(screen.getByText("Optimize")).toBeInTheDocument();
     expect(screen.getByText("History")).toBeInTheDocument();
     expect(screen.getByText("Signals")).toBeInTheDocument();
     expect(screen.getByText("Data")).toBeInTheDocument();
@@ -40,6 +41,9 @@ describe("Sidebar", () => {
     const compare = screen.getByText("Compare").closest("a");
     expect(compare).toHaveAttribute("href", "/compare");
 
+    const optimize = screen.getByText("Optimize").closest("a");
+    expect(optimize).toHaveAttribute("href", "/optimize");
+
     const history = screen.getByText("History").closest("a");
     expect(history).toHaveAttribute("href", "/history");
 
@@ -53,6 +57,6 @@ describe("Sidebar", () => {
   it("should render navigation icons", () => {
     const { container } = renderSidebar();
     const links = container.querySelectorAll("a");
-    expect(links).toHaveLength(5);
+    expect(links).toHaveLength(6);
   });
 });

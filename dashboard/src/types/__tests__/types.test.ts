@@ -5,11 +5,8 @@ import type {
   Trade,
   EquityPoint,
   DailyPnl,
-  BacktestResult,
-  BacktestRunResponse,
   BacktestRunSummary,
   CompareRequest,
-  CompareResultItem,
   SignalRow,
   InstrumentRow,
   CandleRow,
@@ -432,9 +429,7 @@ describe("Type interfaces", () => {
     };
 
     const compareReq: CompareRequest = {
-      configs: [
-        { instrument: "DAX", start_date: "2024-01-01", end_date: "2024-12-31", config },
-      ],
+      configs: [{ instrument: "DAX", start_date: "2024-01-01", end_date: "2024-12-31", config }],
     };
     expect(compareReq.configs).toHaveLength(1);
   });

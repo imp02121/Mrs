@@ -33,18 +33,10 @@ function Section({
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">
-        {label}
-      </label>
+      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
       {children}
     </div>
   );
@@ -100,9 +92,7 @@ export default function ConfigPanel({ onResult }: ConfigPanelProps) {
         <Field label="Mode">
           <select
             value={store.slMode}
-            onChange={(e) =>
-              store.setField("slMode", e.target.value as typeof store.slMode)
-            }
+            onChange={(e) => store.setField("slMode", e.target.value as typeof store.slMode)}
             className={selectClass}
           >
             <option value="SignalBarExtreme">Signal Bar Extreme</option>
@@ -155,9 +145,7 @@ export default function ConfigPanel({ onResult }: ConfigPanelProps) {
         <Field label="Mode">
           <select
             value={store.exitMode}
-            onChange={(e) =>
-              store.setField("exitMode", e.target.value as typeof store.exitMode)
-            }
+            onChange={(e) => store.setField("exitMode", e.target.value as typeof store.exitMode)}
             className={selectClass}
           >
             <option value="EndOfDay">End of Day</option>
@@ -184,9 +172,7 @@ export default function ConfigPanel({ onResult }: ConfigPanelProps) {
               <input
                 type="text"
                 value={store.trailingStopDistance}
-                onChange={(e) =>
-                  store.setField("trailingStopDistance", e.target.value)
-                }
+                onChange={(e) => store.setField("trailingStopDistance", e.target.value)}
                 className={inputClass}
               />
             </Field>
@@ -194,9 +180,7 @@ export default function ConfigPanel({ onResult }: ConfigPanelProps) {
               <input
                 type="text"
                 value={store.trailingStopActivation}
-                onChange={(e) =>
-                  store.setField("trailingStopActivation", e.target.value)
-                }
+                onChange={(e) => store.setField("trailingStopActivation", e.target.value)}
                 className={inputClass}
               />
             </Field>
@@ -230,9 +214,7 @@ export default function ConfigPanel({ onResult }: ConfigPanelProps) {
           <input
             type="checkbox"
             checked={store.addToWinnersEnabled}
-            onChange={(e) =>
-              store.setField("addToWinnersEnabled", e.target.checked)
-            }
+            onChange={(e) => store.setField("addToWinnersEnabled", e.target.checked)}
             className="rounded border-gray-300"
           />
           Enable adding to winners
@@ -253,9 +235,7 @@ export default function ConfigPanel({ onResult }: ConfigPanelProps) {
                 min={1}
                 max={10}
                 value={store.maxAdditions}
-                onChange={(e) =>
-                  store.setField("maxAdditions", parseInt(e.target.value, 10) || 1)
-                }
+                onChange={(e) => store.setField("maxAdditions", parseInt(e.target.value, 10) || 1)}
                 className={inputClass}
               />
             </Field>
@@ -263,9 +243,7 @@ export default function ConfigPanel({ onResult }: ConfigPanelProps) {
               <input
                 type="text"
                 value={store.addSizeMultiplier}
-                onChange={(e) =>
-                  store.setField("addSizeMultiplier", e.target.value)
-                }
+                onChange={(e) => store.setField("addSizeMultiplier", e.target.value)}
                 className={inputClass}
               />
             </Field>
@@ -289,9 +267,7 @@ export default function ConfigPanel({ onResult }: ConfigPanelProps) {
             min={1}
             max={10}
             value={store.signalBarIndex}
-            onChange={(e) =>
-              store.setField("signalBarIndex", parseInt(e.target.value, 10) || 2)
-            }
+            onChange={(e) => store.setField("signalBarIndex", parseInt(e.target.value, 10) || 2)}
             className={inputClass}
           />
         </Field>
@@ -343,9 +319,7 @@ export default function ConfigPanel({ onResult }: ConfigPanelProps) {
             <input
               type="text"
               value={store.commissionPerTrade}
-              onChange={(e) =>
-                store.setField("commissionPerTrade", e.target.value)
-              }
+              onChange={(e) => store.setField("commissionPerTrade", e.target.value)}
               className={inputClass}
             />
           </Field>

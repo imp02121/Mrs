@@ -14,10 +14,7 @@ interface EquityCurveProps {
   strokeColor?: string;
 }
 
-export default function EquityCurve({
-  data,
-  strokeColor = "#2563EB",
-}: EquityCurveProps) {
+export default function EquityCurve({ data, strokeColor = "#2563EB" }: EquityCurveProps) {
   const chartData = data.map((pt) => ({
     date: pt.timestamp.slice(0, 10),
     equity: parseFloat(pt.equity),
@@ -48,13 +45,7 @@ export default function EquityCurve({
               border: "1px solid #E5E7EB",
             }}
           />
-          <Line
-            type="monotone"
-            dataKey="equity"
-            stroke={strokeColor}
-            strokeWidth={2}
-            dot={false}
-          />
+          <Line type="monotone" dataKey="equity" stroke={strokeColor} strokeWidth={2} dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

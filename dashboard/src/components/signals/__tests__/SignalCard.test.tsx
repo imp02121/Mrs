@@ -55,7 +55,7 @@ describe("SignalCard", () => {
   });
 
   it("should show pending status badge with amber styling", () => {
-    const { container } = render(
+    render(
       <SignalCard instrumentName="DAX" signal={makeSignal({ status: "pending" })} />,
     );
     const badge = screen.getByText("pending");
@@ -65,9 +65,7 @@ describe("SignalCard", () => {
   });
 
   it("should show filled status badge with emerald styling", () => {
-    render(
-      <SignalCard instrumentName="DAX" signal={makeSignal({ status: "filled" })} />,
-    );
+    render(<SignalCard instrumentName="DAX" signal={makeSignal({ status: "filled" })} />);
     const badge = screen.getByText("filled");
     expect(badge).toBeInTheDocument();
     expect(badge.className).toContain("bg-emerald-100");
@@ -75,9 +73,7 @@ describe("SignalCard", () => {
   });
 
   it("should show expired status badge with gray styling", () => {
-    render(
-      <SignalCard instrumentName="DAX" signal={makeSignal({ status: "expired" })} />,
-    );
+    render(<SignalCard instrumentName="DAX" signal={makeSignal({ status: "expired" })} />);
     const badge = screen.getByText("expired");
     expect(badge).toBeInTheDocument();
     expect(badge.className).toContain("bg-gray-100");

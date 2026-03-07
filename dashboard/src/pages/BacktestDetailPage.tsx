@@ -18,9 +18,7 @@ export default function BacktestDetailPage() {
   if (isError || !data) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-red-600 text-sm">
-          Failed to load backtest. It may not exist.
-        </div>
+        <div className="text-red-600 text-sm">Failed to load backtest. It may not exist.</div>
       </div>
     );
   }
@@ -29,10 +27,8 @@ export default function BacktestDetailPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        Backtest Detail
-      </h2>
-      <ResultsPanel result={result.result} />
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">Backtest Detail</h2>
+      <ResultsPanel result={result.result} backtestId={id} />
     </div>
   );
 }

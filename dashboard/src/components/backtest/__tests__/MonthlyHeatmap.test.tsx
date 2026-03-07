@@ -10,12 +10,23 @@ describe("MonthlyHeatmap", () => {
   });
 
   it("should render month headers", () => {
-    const data: DailyPnl[] = [
-      { date: "2024-01-15", pnl: "100.00", cumulative: "100.00" },
-    ];
+    const data: DailyPnl[] = [{ date: "2024-01-15", pnl: "100.00", cumulative: "100.00" }];
     render(<MonthlyHeatmap data={data} />);
 
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     for (const m of months) {
       expect(screen.getByText(m)).toBeInTheDocument();
     }
@@ -56,9 +67,7 @@ describe("MonthlyHeatmap", () => {
   });
 
   it("should show dashes for months with no data", () => {
-    const data: DailyPnl[] = [
-      { date: "2024-01-15", pnl: "100.00", cumulative: "100.00" },
-    ];
+    const data: DailyPnl[] = [{ date: "2024-01-15", pnl: "100.00", cumulative: "100.00" }];
     const { container } = render(<MonthlyHeatmap data={data} />);
 
     // Should have 11 dashes for the 11 months with no data (plus the header row)

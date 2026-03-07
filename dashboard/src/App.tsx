@@ -8,6 +8,7 @@ import ComparePage from "@/pages/ComparePage.tsx";
 import HistoryPage from "@/pages/HistoryPage.tsx";
 import SignalsPage from "@/pages/SignalsPage.tsx";
 import DataPage from "@/pages/DataPage.tsx";
+import OptimizePage from "@/pages/OptimizePage.tsx";
 
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -33,6 +34,7 @@ function AppRoutes() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/signals" element={<SignalsPage />} />
         <Route path="/data" element={<DataPage />} />
+        <Route path="/optimize" element={<OptimizePage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

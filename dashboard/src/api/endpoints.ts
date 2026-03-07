@@ -26,13 +26,8 @@ import authApi from "./auth-client.ts";
 // Backtest
 // ---------------------------------------------------------------------------
 
-export async function runBacktest(
-  req: RunBacktestRequest,
-): Promise<BacktestRunResponse> {
-  const res = await api.post<ApiResponse<BacktestRunResponse>>(
-    "/backtest/run",
-    req,
-  );
+export async function runBacktest(req: RunBacktestRequest): Promise<BacktestRunResponse> {
+  const res = await api.post<ApiResponse<BacktestRunResponse>>("/backtest/run", req);
   return res.data.data;
 }
 
@@ -46,20 +41,14 @@ export async function getBacktestTrades(
   page = 0,
   perPage = 50,
 ): Promise<PaginatedResponse<unknown>> {
-  const res = await api.get<PaginatedResponse<unknown>>(
-    `/backtest/${id}/trades`,
-    { params: { page, per_page: perPage } },
-  );
+  const res = await api.get<PaginatedResponse<unknown>>(`/backtest/${id}/trades`, {
+    params: { page, per_page: perPage },
+  });
   return res.data;
 }
 
-export async function compareBacktests(
-  req: CompareRequest,
-): Promise<CompareResultItem[]> {
-  const res = await api.post<ApiResponse<CompareResultItem[]>>(
-    "/backtest/compare",
-    req,
-  );
+export async function compareBacktests(req: CompareRequest): Promise<CompareResultItem[]> {
+  const res = await api.post<ApiResponse<CompareResultItem[]>>("/backtest/compare", req);
   return res.data.data;
 }
 
@@ -67,11 +56,16 @@ export async function getBacktestHistory(
   page = 0,
   perPage = 50,
 ): Promise<PaginatedResponse<BacktestRunSummary>> {
-  const res = await api.get<PaginatedResponse<BacktestRunSummary>>(
-    "/backtest/history",
-    { params: { page, per_page: perPage } },
-  );
+  const res = await api.get<PaginatedResponse<BacktestRunSummary>>("/backtest/history", {
+    params: { page, per_page: perPage },
+  });
   return res.data;
+}
+
+/** Returns the full URL for CSV export of a backtest run. */
+export function getBacktestCsvUrl(id: string): string {
+  const base = import.meta.env.VITE_API_URL ?? "http://localhost:3001/api";
+  return `${base}/backtest/${id}/export/csv`;
 }
 
 // ---------------------------------------------------------------------------
@@ -88,13 +82,8 @@ export async function getConfig(id: string): Promise<ConfigResponse> {
   return res.data.data;
 }
 
-export async function createConfig(
-  req: CreateConfigRequest,
-): Promise<CreateConfigResponse> {
-  const res = await api.post<ApiResponse<CreateConfigResponse>>(
-    "/configs",
-    req,
-  );
+export async function createConfig(req: CreateConfigRequest): Promise<CreateConfigResponse> {
+  const res = await api.post<ApiResponse<CreateConfigResponse>>("/configs", req);
   return res.data.data;
 }
 
@@ -107,15 +96,11 @@ export async function deleteConfig(id: string): Promise<void> {
 // ---------------------------------------------------------------------------
 
 export async function listInstruments(): Promise<InstrumentRow[]> {
-  const res = await api.get<ApiResponse<InstrumentRow[]>>(
-    "/data/instruments",
-  );
+  const res = await api.get<ApiResponse<InstrumentRow[]>>("/data/instruments");
   return res.data.data;
 }
 
-export async function getCandles(
-  params: CandleQuery,
-): Promise<CandleRow[]> {
+export async function getCandles(params: CandleQuery): Promise<CandleRow[]> {
   const res = await api.get<ApiResponse<CandleRow[]>>("/data/candles", {
     params,
   });
@@ -131,12 +116,8 @@ export async function getTodaySignals(): Promise<SignalRow[]> {
   return res.data.data;
 }
 
-export async function getLatestSignal(
-  instrument: string,
-): Promise<SignalRow> {
-  const res = await api.get<ApiResponse<SignalRow>>(
-    `/signals/${instrument}/latest`,
-  );
+export async function getLatestSignal(instrument: string): Promise<SignalRow> {
+  const res = await api.get<ApiResponse<SignalRow>>(`/signals/${instrument}/latest`);
   return res.data.data;
 }
 
@@ -144,23 +125,13 @@ export async function getLatestSignal(
 // Auth
 // ---------------------------------------------------------------------------
 
-export async function requestOtp(
-  body: RequestOtpBody,
-): Promise<MessageResponse> {
-  const res = await authApi.post<MessageResponse>(
-    "/auth/request-otp",
-    body,
-  );
+export async function requestOtp(body: RequestOtpBody): Promise<MessageResponse> {
+  const res = await authApi.post<MessageResponse>("/auth/request-otp", body);
   return res.data;
 }
 
-export async function verifyOtp(
-  body: VerifyOtpBody,
-): Promise<VerifyOtpResponse> {
-  const res = await authApi.post<VerifyOtpResponse>(
-    "/auth/verify-otp",
-    body,
-  );
+export async function verifyOtp(body: VerifyOtpBody): Promise<VerifyOtpResponse> {
+  const res = await authApi.post<VerifyOtpResponse>("/auth/verify-otp", body);
   return res.data;
 }
 
