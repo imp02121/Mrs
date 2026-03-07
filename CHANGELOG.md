@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- React dashboard (Phase 6b)
+  - 6 pages: Backtest (`/`), Compare (`/compare`), History (`/history`), Signals (`/signals`), Data (`/data`), Login (`/login`)
+  - OTP login page with auto-advance 6-digit input, paste support, and 60-second resend cooldown
+  - AppShell layout with 220px fixed sidebar, 56px top bar, and protected routes via `AuthProvider`
+  - Backtest page with two-column layout: 360px config panel (5 collapsible sections) and results panel
+  - Config panel sections: Instrument & Dates, Stop Loss (3 modes with conditional fields), Exit Strategy (5 modes), Adding to Winners (toggle with conditional fields), Advanced (signal bar index, entry offset, slippage, commission)
+  - Results panel: StatsCards (2x3 grid), EquityCurve (Recharts line chart), MonthlyHeatmap (color-coded grid), DrawdownChart (Recharts area chart), TradeTable (TanStack Table with sorting and pagination)
+  - Compare page with 2-4 config slots, inline editing, side-by-side stats table, and overlaid equity curves (Recharts multi-line)
+  - History page with TanStack Table (sortable columns, click-to-detail navigation, server-side pagination)
+  - Signals page with 2x2 grid of auto-refreshing signal cards (60-second refetch interval via TanStack Query)
+  - Data page with instruments table and candle explorer using Lightweight Charts (dynamic import) and raw data table
+  - Backtest detail page (`/backtest/:id`) for viewing saved results read-only
+  - TypeScript types (`src/types/`) mirroring Rust API: strategy, backtest, signal, data, config, auth, and API wrapper types
+  - TanStack Query hooks for all endpoints: `useRunBacktest`, `useBacktest`, `useBacktestTrades`, `useCompareBacktests`, `useBacktestHistory`, `useTodaySignals`, `useLatestSignal`, `useInstruments`, `useCandles`
+  - Zustand stores: `backtest-store` (full config panel state with `toRequest()` serialization) and `ui-store` (sidebar collapsed state)
+  - Axios API client (`api/client.ts`) with JWT request interceptor and 401 response interceptor (auto-redirect to login)
+  - Separate auth API client (`api/auth-client.ts`) for auth service endpoints
+  - Auth context (`lib/auth.tsx`) with `AuthProvider`, `useAuth` hook, localStorage token persistence, and `GET /auth/me` validation on mount
+  - Shared components: `InstrumentSelector`, `DateRangePicker`, `SignalCard`
+
 - Auth microservice (Phase 6a)
   - Standalone `auth/` crate (Rust/Axum) serving OTP-based authentication on port 3002
   - Whitelist-only login: only pre-approved emails in `allowed_emails` table can authenticate
