@@ -18,3 +18,15 @@ tracing-subscriber = { workspace = true }
 anyhow = { workspace = true }
 dotenvy = { workspace = true }
 teloxide = { workspace = true }
+thiserror = { workspace = true }
+sqlx = { workspace = true }
+reqwest = { workspace = true }
+chrono = { workspace = true }
+chrono-tz = { workspace = true }
+rust_decimal = { workspace = true }
+uuid = { workspace = true }
+dptree = "0.3"
+
+[dev-dependencies]
+rust_decimal_macros = "1"
+serial_test = "3"
