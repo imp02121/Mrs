@@ -37,12 +37,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // On mount: validate existing token
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchUser().finally(() => setIsLoading(false));
     } else {
-      setIsLoading(false);
+      setIsLoading(false); // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -14,19 +14,21 @@ interface DrawdownChartProps {
   data: EquityPoint[];
 }
 
+function computeDrawdown(data: EquityPoint[]) {
+  let peak = -Infinity;
+  return data.map((pt) => {
+    const equity = parseFloat(pt.equity);
+    if (equity > peak) peak = equity;
+    const drawdown = peak > 0 ? ((equity - peak) / peak) * 100 : 0;
+    return {
+      date: pt.timestamp.slice(0, 10),
+      drawdown: parseFloat(drawdown.toFixed(2)),
+    };
+  });
+}
+
 export default function DrawdownChart({ data }: DrawdownChartProps) {
-  const chartData = useMemo(() => {
-    let peak = -Infinity;
-    return data.map((pt) => {
-      const equity = parseFloat(pt.equity);
-      if (equity > peak) peak = equity;
-      const drawdown = peak > 0 ? ((equity - peak) / peak) * 100 : 0;
-      return {
-        date: pt.timestamp.slice(0, 10),
-        drawdown: parseFloat(drawdown.toFixed(2)),
-      };
-    });
-  }, [data]);
+  const chartData = useMemo(() => computeDrawdown(data), [data]);
 
   return (
     <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
