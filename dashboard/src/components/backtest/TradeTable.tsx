@@ -85,6 +85,7 @@ const columns = [
 export default function TradeTable({ trades }: TradeTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: trades,
     columns,

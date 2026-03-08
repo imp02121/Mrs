@@ -69,6 +69,7 @@ export default function HistoryPage() {
   const rows = useMemo(() => data?.data ?? [], [data]);
   const pagination = data?.pagination;
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: rows,
     columns,

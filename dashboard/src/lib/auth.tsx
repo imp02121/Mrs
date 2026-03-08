@@ -37,6 +37,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // On mount: validate existing token
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (token) {
       fetchUser().finally(() => setIsLoading(false));
