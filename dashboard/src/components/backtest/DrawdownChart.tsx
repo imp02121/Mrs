@@ -45,7 +45,7 @@ export default function DrawdownChart({ data }: DrawdownChartProps) {
             tickFormatter={(v: number) => `${v}%`}
           />
           <Tooltip
-            formatter={(value: number) => [`${value}%`, "Drawdown"]}
+            formatter={(value: number | undefined) => [`${value ?? 0}%`, "Drawdown"]}
             contentStyle={{
               fontSize: 12,
               borderRadius: 6,

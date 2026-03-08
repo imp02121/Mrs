@@ -23,6 +23,7 @@ COPY auth/Cargo.toml auth/Cargo.toml
 RUN cargo build --release --bin sr-engine 2>/dev/null || true
 
 # Copy real source and build
+COPY migrations/ migrations/
 COPY engine/ engine/
 COPY telegram/ telegram/
 COPY auth/ auth/
