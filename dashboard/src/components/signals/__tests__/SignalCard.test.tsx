@@ -55,9 +55,7 @@ describe("SignalCard", () => {
   });
 
   it("should show pending status badge with amber styling", () => {
-    render(
-      <SignalCard instrumentName="DAX" signal={makeSignal({ status: "pending" })} />,
-    );
+    render(<SignalCard instrumentName="DAX" signal={makeSignal({ status: "pending" })} />);
     const badge = screen.getByText("pending");
     expect(badge).toBeInTheDocument();
     expect(badge.className).toContain("bg-amber-100");
